@@ -1,0 +1,40 @@
+import pandas as pd
+
+# 1. Load and combine data
+df1 = pd.read_csv('Data/big_data_set1_f.csv', encoding='cp949')
+df2 = pd.read_csv('Data/big_data_set2_f.csv', encoding='cp949')
+df3 = pd.read_csv('Data/big_data_set3_f.csv', encoding='cp949')
+df = pd.concat([df1, df2, df3])
+
+# Rename columns for clarity
+df.rename(columns={
+    'HPSN_MCT_BZN_CD_NM': '업종',
+    'HPSN_MCT_ZCD_NM': '상권',
+    'ARE_D': '개설일',
+    'MCT_ME_D': '폐업일'
+}, inplace=True)
+
+# 2. Calculate business lifespan
+df_closed = df.dropna(subset=['폐업일']).copy()
+df_closed['개설일'] = pd.to_datetime(df_closed['개설일'], format='%Y%m%d')
+df_closed['폐업일'] = pd.to_datetime(df_closed['폐업일'], format='%Y%m%d')
+df_closed['영업기간'] = (df_closed['폐업일'] - df_closed['개설일']).dt.days
+
+# 3. Analysis 1: Average lifespan by business category
+avg_lifespan_by_category = df_closed.groupby('업종')['영업기간'].mean().reset_index()
+avg_lifespan_by_category['평균영업기간_년'] = avg_lifespan_by_category['영업기간'] / 365
+print('--- 업종 별 평균 영업 기간 ---')
+print(avg_lifespan_by_category[['업종', '평균영업기간_년']].sort_values(by='평균영업기간_년', ascending=False))
+
+# 4. Analysis 2: Average lifespan by commercial district
+avg_lifespan_by_district = df_closed.groupby('상권')['영업기간'].mean().reset_index()
+avg_lifespan_by_district['평균영업기간_년'] = avg_lifespan_by_district['영업기간'] / 365
+print('--- 상권 별 평균 영업 기간 ---')
+print(avg_lifespan_by_district[['상권', '평균영업기간_년']].sort_values(by='평균영업기간_년', ascending=False))
+
+# 5. Analysis 3: Top 5 business categories per commercial district
+top5_by_district = df.groupby(['상권', '업종']).size().reset_index(name='업종수')
+top5_by_district = top5_by_district.sort_values(['상권', '업종수'], ascending=[True, False])
+top5_results = top5_by_district.groupby('상권').head(5)
+print('--- 상권별 가장 많은 업종 BEST 5 ---')
+print(top5_results)
