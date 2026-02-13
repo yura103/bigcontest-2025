@@ -121,7 +121,7 @@
 
 | KNN 혼동 행렬 | ET 혼동 행렬 |
 | :---: | :---: |
-| ![KNN 혼동 행렬](images/modeling/KNN 혼동 행렬) | ![ET 혼동 행렬](images/modeling/ET 혼동 행렬) |
+| ![KNN 혼동 행렬](images/modeling/KNN 혼동 행렬.png) | ![ET 혼동 행렬](images/modeling/ET 혼동 행렬.png) |
 
 - **기타 평가지표**: AUC(Area Under the Curve), F1-Score 등을 통해 모델의 전반적인 성능을 종합적으로 평가했습니다.
 
